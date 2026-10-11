@@ -6,6 +6,7 @@ LABEL org.opencontainers.image.revision=$SOURCE_REVISION \
       org.opencontainers.image.source=https://github.com/m0vse/wlan-cloud-ucentralfms \
       org.opencontainers.image.ref.name=feature/granular-user-access
 ENV APP_NAME=owfms APP_USER=owfms APP_ROOT=/owfms-data APP_CONFIG=/owfms-data APP_HOME_DIR=/openwifi
+ENV OWFMS_USER=owfms OWFMS_ROOT=/owfms-data OWFMS_CONFIG=/owfms-data
 
 RUN useradd owfms && mkdir -p /openwifi /owfms-data && chown owfms: /owfms-data
 RUN apt-get update && apt-get install --no-install-recommends -y \
