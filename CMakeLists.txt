@@ -42,6 +42,7 @@ endif()
 
 find_package(OpenSSL    REQUIRED)
 find_package(fmt        REQUIRED)
+find_package(nlohmann_json REQUIRED)
 find_package(ZLIB       REQUIRED)
 find_package(Poco       REQUIRED COMPONENTS Crypto JWT Net Util NetSSL Data DataSQLite)
 find_package(AWSSDK     REQUIRED COMPONENTS s3)
@@ -160,3 +161,7 @@ target_link_libraries( owfms PUBLIC
         resolv
         CppKafka::cppkafka
     )
+
+target_sources(owfms PRIVATE src/framework/UserAccessClient.cpp)
+target_link_libraries(owfms PUBLIC nlohmann_json::nlohmann_json)
+target_compile_definitions(owfms PRIVATE OPENWIFI_ACCESS_SERVICE="owfms")

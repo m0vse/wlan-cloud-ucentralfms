@@ -1,0 +1,24 @@
+# Build context includes the qualified isolated-build binary and public runtime assets.
+FROM openwifi-access-sdk-complete:20261011 AS dependencies
+FROM debian:12-slim
+ARG SOURCE_REVISION=unknown
+LABEL org.opencontainers.image.revision=$SOURCE_REVISION \
+      org.opencontainers.image.source=https://github.com/m0vse/wlan-cloud-ucentralfms \
+      org.opencontainers.image.ref.name=feature/granular-user-access
+ENV APP_NAME=owfms APP_USER=owfms APP_ROOT=/owfms-data APP_CONFIG=/owfms-data APP_HOME_DIR=/openwifi
+
+RUN useradd owfms && mkdir -p /openwifi /owfms-data && chown owfms: /owfms-data
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    librdkafka++1 gosu gettext ca-certificates bash jq curl wget \
+    libmariadb3 libpq5 postgresql-client libfmt9 sqlite3 unixodbc libexpat1 && \
+    rm -rf /var/lib/apt/lists/*
+COPY --from=dependencies /usr/local/lib/*.so* /usr/local/lib/
+COPY --from=dependencies /vcpkg/installed/x64-linux/lib/*.so* /usr/local/lib/
+COPY isolated-build/owfms /openwifi/owfms
+COPY owfms.properties.tmpl /
+COPY docker-entrypoint.sh wait-for-postgres.sh /
+COPY readiness_check /readiness_check
+COPY test_scripts/curl/cli /cli
+RUN ldconfig && ldd /openwifi/owfms && ! ldd /openwifi/owfms | grep 'not found'
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/openwifi/owfms"]

@@ -1,0 +1,7 @@
+FROM openwifi-access-sdk-complete:20261011 AS build
+WORKDIR /access/owfms
+COPY src /access/owfms/src
+COPY cmake /access/owfms/cmake
+COPY CMakeLists.txt build /access/owfms/
+RUN cmake -S . -B /access/owfms-build -DCMAKE_TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake && \
+    cmake --build /access/owfms-build -j2
